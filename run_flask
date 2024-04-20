@@ -1,0 +1,4 @@
+#!/usr/bin/bash
+# Running flask applicaiton.
+# flask --app ./app/app.py run
+python3 ./app/app.py

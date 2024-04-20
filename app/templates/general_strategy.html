@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>
+			{{ strategy.metadata.strategy_name}} - {{ strategy.metadata.created_by}}  
+		</title>
+	</head>
+	<body>
+		<h1>{{ strategy.metadata.strategy_name }}</h1>
+		{% for key, data in strategy.metadata.items() %}
+			<p>
+				{{ key }}: {{ data }}
+			</p>
+		{% endfor %}
+	</body>
+</html>

@@ -1,0 +1,4 @@
+#!/usr/bin/bash
+# Installing flask.
+pip install flask
+pip install -U Flask-SQLAlchemy
