@@ -35,7 +35,7 @@ class Strategy(db.Model):
                                         back_populates="strategy")
 
     def __init__(self, name="Untitled", created_by="Untitled"):
-        """Initializing the default values of Strategy's record"""
+        """Initializing the default values of a Strategy's record"""
         self.id = uuid4()
         self.creation_date = datetime.utcnow()
         self.update_date = self.creation_date
@@ -44,8 +44,10 @@ class Strategy(db.Model):
 
     def __str__(self):
         """A string representation to the Strategy Class when printed."""
-        return f"{self.id}\n{self.name}\n{self.creation_date}\n"\
-               f"{self.update_date}\n{self.created_by}"
+        return f"id: {self.id}\nname: {self.name}\n"\
+               f"creation date: {self.creation_date}\n"\
+               f"update date: {self.update_date}\n"\
+               f"created by: {self.created_by}"
 
 
 class Framework(db.Model):
@@ -58,13 +60,13 @@ class Framework(db.Model):
                                                 back_populates="framework")
 
     def __init__(self, name="Untitled"):
-        """Initializing the default values of Framework's record."""
+        """Initializing the default values of a Framework's record."""
         self.id = uuid4()
         self.name = name
 
     def __str__(self):
         """A string representation to the Framwork Class when printed."""
-        return f"{self.id}\n{self.name}"
+        return f"id: {self.id}\nname: {self.name}"
 
 
 class Direction(db.Model):
@@ -79,12 +81,58 @@ class Direction(db.Model):
     result: Mapped[str] = mapped_column(db.String(1024), nullable=False)
     strategy_id: Mapped[UUID] = mapped_column(db.ForeignKey("strategy.id"))
     strategy: Mapped["Strategy"] = db.relationship(back_populates="directions")
+    goals: Mapped[List["Goal"]] = db.relationship(back_populates="direction")
 
     def __init__(self, name="Untitled"):
-        """Initializing the default values of Direction's record."""
+        """Initializing the default values of a Direction's record."""
         self.id = uuid4()
         self.name = name
 
     def __str__(self):
         """A string representation to the Direction Class when printed."""
-        return f"{self.id}\n{self.name}\n{self.definition}\n{self.result}"
+        return f"id: {self.id}\nname: {self.name}\n"\
+               f"defintion: {self.definition}\nresult: {self.result}"
+
+
+class Goal(db.Model):
+    """Class Goal that defines a goal instance in a certain perspective\
+    related to a specific direction or a strategic theme."""
+    __tablename__ = "goal"
+    id: Mapped[UUID] = mapped_column(db.Uuid, primary_key=True,
+                                     unique=True, nullable=False)
+    name: Mapped[str] = mapped_column(db.String(256), nullable=False,
+                                      default="Untitled")
+    note: Mapped[Optional[str]] = mapped_column(db.String(1024), nullable=True)
+    direction_id: Mapped[UUID] = mapped_column(db.ForeignKey("direction.id"))
+    direction: Mapped["Direction"] = db.relationship(back_populates="goals")
+    perspective_id: Mapped[UUID] = mapped_column(
+                                        db.ForeignKey("perspective.id"))
+    perspective: Mapped["Perspective"] = db.relationship(
+                                        back_populates="goals")
+
+    def __init__(self, name="Untitled"):
+        """Initializing the default values of a Goal's record."""
+        self.id = uuid4()
+        self.name = name
+
+    def __str__(self):
+        """A string representation to the Goal Class when printed."""
+        return f"id: {self.id}\nname: {self.name}\nnote: {self.note}"
+
+
+class Perspective(db.Model):
+    """Class Perspective that defines the main perspective category for\
+    a specific strategic goal."""
+    __tablename__ = "perspective"
+    id: Mapped[UUID] = mapped_column(db.Uuid, primary_key=True,
+                                     unique=True, nullable=False)
+    name: Mapped[str] = mapped_column(db.String(128), nullable=False)
+    goals: Mapped[List["Goal"]] = db.relationship(back_populates="perspective")
+
+    def __init__(self):
+        """Initializing the default values of a Perspective's record."""
+        self.id = uuid4()
+
+    def __str__(self):
+        """A string representation to the Perspective Class when printed."""
+        return f"id: {self.id}\nname: {self.name}"
