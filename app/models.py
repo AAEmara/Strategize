@@ -28,13 +28,14 @@ class Strategy(db.Model):
                                                     nullable=False)
     update_date: Mapped[datetime] = mapped_column(db.DateTime, nullable=False)
     created_by: Mapped[str] = mapped_column(db.String(128), nullable=False)
-    framework_id: Mapped[UUID] = mapped_column(db.ForeignKey("framework.id"))
+    framework_id: Mapped[int] = mapped_column(db.ForeignKey("framework.id"),
+                                              default=1)
     framework: Mapped["Framework"] = db.relationship(
                                         back_populates="strategies")
     directions: Mapped[List["Direction"]] = db.relationship(
                                         back_populates="strategy")
 
-    def __init__(self, name="Untitled", created_by="Untitled"):
+    def __init__(self, name="Untitled", created_by="Untitled", fwork=1):
         """Initializing the default values of a Strategy's record"""
         self.id = uuid4()
         self.creation_date = datetime.utcnow()
@@ -42,18 +43,29 @@ class Strategy(db.Model):
         self.name = name
         self.created_by = created_by
 
+    def to_dict(self):
+        """Returns a dictionary of the Strategy Object."""
+        obj_dict = dict()
+        for key, value in self.__dict__.items():
+            if key == "_sa_instance_state":
+                continue
+            elif key in ["creation_date", "update_date"]:
+                value = value.isoformat()
+            obj_dict[key] = value
+        return (obj_dict)
+
     def __str__(self):
         """A string representation to the Strategy Class when printed."""
-        return f"id: {self.id}\nname: {self.name}\n"\
-               f"creation date: {self.creation_date}\n"\
-               f"update date: {self.update_date}\n"\
-               f"created by: {self.created_by}"
+        return f"{{'id': {self.id}, 'name': {self.name},"\
+               f"'creation date': {self.creation_date},"\
+               f"'update date': {self.update_date},"\
+               f"'created by': {self.created_by}}}"
 
 
 class Framework(db.Model):
     """Class Framework defines the framework that the strategy follows."""
     __tablename__ = "framework"
-    id: Mapped[UUID] = mapped_column(db.Uuid, primary_key=True,
+    id: Mapped[int] = mapped_column(db.Integer, primary_key=True,
                                      unique=True, nullable=False)
     name: Mapped[str] = mapped_column(db.String(64), nullable=False)
     strategies: Mapped[List["Strategy"]] = db.relationship(
@@ -61,7 +73,6 @@ class Framework(db.Model):
 
     def __init__(self, name="Untitled"):
         """Initializing the default values of a Framework's record."""
-        self.id = uuid4()
         self.name = name
 
     def __str__(self):
