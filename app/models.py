@@ -11,7 +11,16 @@ from uuid import UUID, uuid4
 
 class Base(DeclarativeBase):
     """Class Base to represent the SQLAlchemy DeclarativeBase."""
-    pass
+    def to_dict(self):
+        """Returns a dictionary of an Object."""
+        obj_dict = dict()
+        for key, value in self.__dict__.items():
+            if key == "_sa_instance_state":
+                continue
+            elif key in ["creation_date", "update_date"]:
+                value = value.isoformat()
+            obj_dict[key] = value
+        return (obj_dict)
 
 
 db = SQLAlchemy(model_class=Base)
@@ -43,22 +52,11 @@ class Strategy(db.Model):
         self.name = name
         self.created_by = created_by
 
-    def to_dict(self):
-        """Returns a dictionary of the Strategy Object."""
-        obj_dict = dict()
-        for key, value in self.__dict__.items():
-            if key == "_sa_instance_state":
-                continue
-            elif key in ["creation_date", "update_date"]:
-                value = value.isoformat()
-            obj_dict[key] = value
-        return (obj_dict)
-
     def __str__(self):
         """A string representation to the Strategy Class when printed."""
-        return f"{{'id': {self.id}, 'name': {self.name},"\
-               f"'creation date': {self.creation_date},"\
-               f"'update date': {self.update_date},"\
+        return f"{{'id': {self.id}, 'name': {self.name}, "\
+               f"'creation date': {self.creation_date}, "\
+               f"'update date': {self.update_date}, "\
                f"'created by': {self.created_by}}}"
 
 
@@ -66,7 +64,7 @@ class Framework(db.Model):
     """Class Framework defines the framework that the strategy follows."""
     __tablename__ = "framework"
     id: Mapped[int] = mapped_column(db.Integer, primary_key=True,
-                                     unique=True, nullable=False)
+                                    unique=True, nullable=False)
     name: Mapped[str] = mapped_column(db.String(64), nullable=False)
     strategies: Mapped[List["Strategy"]] = db.relationship(
                                                 back_populates="framework")
@@ -77,14 +75,14 @@ class Framework(db.Model):
 
     def __str__(self):
         """A string representation to the Framwork Class when printed."""
-        return f"id: {self.id}\nname: {self.name}"
+        return f"{{'id': {self.id}, 'name': {self.name}}}"
 
 
 class Direction(db.Model):
     """Class Direction that defines the general strategy theme."""
     __tablename__ = "direction"
-    id: Mapped[UUID] = mapped_column(db.Uuid, primary_key=True,
-                                     unique=True, nullable=False)
+    id: Mapped[int] = mapped_column(db.Integer, primary_key=True,
+                                    unique=True, nullable=False)
     name: Mapped[str] = mapped_column(db.String(128), nullable=False,
                                       default="Untitled")
     definition: Mapped[Optional[str]] = mapped_column(db.String(1024),
@@ -96,25 +94,24 @@ class Direction(db.Model):
 
     def __init__(self, name="Untitled"):
         """Initializing the default values of a Direction's record."""
-        self.id = uuid4()
         self.name = name
 
     def __str__(self):
         """A string representation to the Direction Class when printed."""
-        return f"id: {self.id}\nname: {self.name}\n"\
-               f"defintion: {self.definition}\nresult: {self.result}"
+        return f"{{'id': {self.id}, 'name': {self.name}, "\
+               f"'defintion': {self.definition}, 'result': {self.result}}}"
 
 
 class Goal(db.Model):
     """Class Goal that defines a goal instance in a certain perspective\
     related to a specific direction or a strategic theme."""
     __tablename__ = "goal"
-    id: Mapped[UUID] = mapped_column(db.Uuid, primary_key=True,
-                                     unique=True, nullable=False)
+    id: Mapped[int] = mapped_column(db.Integer, primary_key=True,
+                                    unique=True, nullable=False)
     name: Mapped[str] = mapped_column(db.String(256), nullable=False,
                                       default="Untitled")
     note: Mapped[Optional[str]] = mapped_column(db.String(1024), nullable=True)
-    direction_id: Mapped[UUID] = mapped_column(db.ForeignKey("direction.id"))
+    direction_id: Mapped[int] = mapped_column(db.ForeignKey("direction.id"))
     direction: Mapped["Direction"] = db.relationship(back_populates="goals")
     perspective_id: Mapped[UUID] = mapped_column(
                                         db.ForeignKey("perspective.id"))
@@ -123,27 +120,22 @@ class Goal(db.Model):
 
     def __init__(self, name="Untitled"):
         """Initializing the default values of a Goal's record."""
-        self.id = uuid4()
         self.name = name
 
     def __str__(self):
         """A string representation to the Goal Class when printed."""
-        return f"id: {self.id}\nname: {self.name}\nnote: {self.note}"
+        return f"{{'id': {self.id}, 'name': {self.name}, 'note': {self.note}}}"
 
 
 class Perspective(db.Model):
     """Class Perspective that defines the main perspective category for\
     a specific strategic goal."""
     __tablename__ = "perspective"
-    id: Mapped[UUID] = mapped_column(db.Uuid, primary_key=True,
-                                     unique=True, nullable=False)
+    id: Mapped[int] = mapped_column(db.Integer, primary_key=True,
+                                    unique=True, nullable=False)
     name: Mapped[str] = mapped_column(db.String(128), nullable=False)
     goals: Mapped[List["Goal"]] = db.relationship(back_populates="perspective")
 
-    def __init__(self):
-        """Initializing the default values of a Perspective's record."""
-        self.id = uuid4()
-
     def __str__(self):
         """A string representation to the Perspective Class when printed."""
-        return f"id: {self.id}\nname: {self.name}"
+        return f"{{'id': {self.id}, 'name': {self.name}}}"

@@ -29,6 +29,7 @@ with app.app_context():
     db.create_all()
 
 
+# Strategy_Resource API.
 @app.route("/api/v1/strategies", methods=["GET"], strict_slashes=False)
 def strategies():
     """Returns a collection of strategy resources."""
@@ -139,6 +140,40 @@ def delete_strategy(strategy_id):
         db.session.delete(obj)
         db.session.commit()
     return ({}, 200)
+
+
+# Framework_Resource API.
+@app.route("/api/v1/frameworks", methods=["GET"], strict_slashes=False)
+def frameworks():
+    """Returns a collection of framework resources."""
+    stmt = db.select(Framework)
+    instances = db.session.execute(stmt).all()
+    if not instances:
+        return (jsonify({"error": "Not found"}), 404)
+    records = list()
+    for instance in instances:
+        for obj in instance:
+            records.append(obj.to_dict())
+    return (jsonify(records), 200)
+
+
+@app.route("/api/v1/frameworks/<int:framework_id>", methods=["GET"],
+           strict_slashes=False)
+def get_framework(framework_id):
+    """Returns a  framework resource for a given framework_id."""
+    if not isinstance(framework_id, int):
+        return (jsonify({"error": "Not found"}), 404)
+    stmt = db.select(Framework).where(
+        Framework.id == db.bindparam("framework_id"))
+    try:
+        instance = db.session.execute(stmt,
+                                      {"framework_id": framework_id}).one()
+    except db.exc.NoResultFound:
+        return (jsonify({"error": "Not found"}), 404)
+
+    for obj in instance:
+        record = obj.to_dict()
+    return (jsonify(record), 200)
 
 
 if __name__ == "__main__":
