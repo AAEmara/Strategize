@@ -92,9 +92,11 @@ class Direction(db.Model):
     strategy: Mapped["Strategy"] = db.relationship(back_populates="directions")
     goals: Mapped[List["Goal"]] = db.relationship(back_populates="direction")
 
-    def __init__(self, name="Untitled"):
+    def __init__(self, name="Untitled", result="Undefined", definition=None):
         """Initializing the default values of a Direction's record."""
         self.name = name
+        self.result = result
+        self.definition = definition
 
     def __str__(self):
         """A string representation to the Direction Class when printed."""
@@ -113,14 +115,18 @@ class Goal(db.Model):
     note: Mapped[Optional[str]] = mapped_column(db.String(1024), nullable=True)
     direction_id: Mapped[int] = mapped_column(db.ForeignKey("direction.id"))
     direction: Mapped["Direction"] = db.relationship(back_populates="goals")
-    perspective_id: Mapped[UUID] = mapped_column(
+    perspective_id: Mapped[int] = mapped_column(
                                         db.ForeignKey("perspective.id"))
     perspective: Mapped["Perspective"] = db.relationship(
                                         back_populates="goals")
 
-    def __init__(self, name="Untitled"):
+    def __init__(self, name="Untitled", note=None, direction_id=None,
+                 perspective_id=None):
         """Initializing the default values of a Goal's record."""
         self.name = name
+        self.note = note
+        self.direction_id = direction_id
+        self.perspective_id = perspective_id
 
     def __str__(self):
         """A string representation to the Goal Class when printed."""
