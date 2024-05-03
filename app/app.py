@@ -5,6 +5,7 @@
 from datetime import datetime
 from flask import Flask, render_template, abort, jsonify, request, url_for
 from flask import redirect
+from flask_cors import CORS
 from forms import StrategyForm, DirectionForm
 from uuid import UUID
 import json
@@ -17,9 +18,12 @@ app = Flask(__name__)
 # Using a Secret Key.
 app.config["SECRET_KEY"] = "Thisisasecret!"
 
+CORS(app, resources={r"/*":{'origins': "*"}}) 
+
 # Configuring the MYSQL database, relative to the app instance folder.
 app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+mysqlconnector:\
 //strategize_main_dev:strategize_main_pwd@localhost/strategize"
+
 
 # Initialize app with the extension.
 db.init_app(app)

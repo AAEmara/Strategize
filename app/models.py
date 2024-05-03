@@ -145,3 +145,46 @@ class Perspective(db.Model):
     def __str__(self):
         """A string representation to the Perspective Class when printed."""
         return f"{{'id': {self.id}, 'name': {self.name}}}"
+
+
+class Objective(db.Model):
+    """Class Objective that defines a SMART objective related to a specific 
+strategic goal."""
+    __tablename__ = "objective"
+    id: Mapped[int] = mapped_column(db.Integer, primary_key=True,
+                                    unique=True, nullable=False)
+    name: Mapped[str] = mapped_column(db.String(256), nullable=False)
+    start_date: Mapped[datetime] = mapped_column(db.DateTime, nullable=False)
+    end_date: Mapped[datetime] = mapped_column(db.DateTime, nullable=False)
+    kpi_value: Mapped[str] = mapped_column(db.String(128), nullable=False)
+    milestones: Mapped[List["Milestone"]] = db.relationship(
+                                                back_populates="objective")
+
+    def __str__(self):
+        """A string representation to the Objective Class when printed."""
+        return f"{{'id': {self.id}, 'name': {self.name}, "\
+               f"'start_date': {self.start_date}, "\
+               f"'end_date': {self.end_date}, 'kpi_value': {self.kpi_value}}}"
+
+
+class Milestone(db.Model):
+    """Class Milestone that defines an objective breakdown related to a
+strategic objective."""
+    __tablename__ = "milestone"
+    id: Mapped[int] = mapped_column(db.Integer, primary_key=True,
+                                    unique=True, nullable=False)
+    name: Mapped[str] = mapped_column(db.String(256), nullable=False)
+    kpi_value: Mapped[str] = mapped_column(db.String(128), nullable=False)
+    start_date: Mapped[datetime] = mapped_column(db.DateTime, nullable=False)
+    end_date: Mapped[datetime] = mapped_column(db.DateTime, nullable=False)
+    objective: Mapped["Objective"] = db.relationship(
+                                            back_populates="milestones")
+    objective_id: Mapped[int] = mapped_column(db.ForeignKey("objective.id"))
+
+    def __str__(self):
+        """A string representation to the Milestone Class when printed."""
+        return f"{{'id': {self.id}, 'name': {self.name}, "\
+               f"'kpi_value': {self.kpi_value}, "\
+               f"'start_date': {self.start_date}, "\
+               f"'end_date': {self.end_date}, "\
+               f"'objective': {self.objective}}}"
