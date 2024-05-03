@@ -1,0 +1,3 @@
+#!/usr/bin/bash
+# Installing bootstrap.
+npm install bootstrap

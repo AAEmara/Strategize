@@ -1,0 +1,3 @@
+#!/usr/bin/bash
+# Using Version 18 of Node.js.
+npv use 18
