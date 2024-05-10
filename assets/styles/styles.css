@@ -1,0 +1,39 @@
+.c-item {
+	height: 480px;
+}
+
+.c-img {
+	height: 100%;
+	object-fit: cover;
+	object-position: center;
+	filter: brightness(0.4)
+}
+
+.c-item-special {
+	height: 480px;
+}
+
+.c-img-special {
+	height: 100%;
+	object-fit: cover;
+	filter: brightness(0.5)
+}
+
+.about-img1 {
+	width: 200;
+	height: 300px;
+	object-fit: cover;
+}
+
+.gif-container {
+  max-width: 100%;
+  margin: 0 auto; /* Center horizontally */
+  padding: 20px; /* Add suitable margin */
+  box-sizing: border-box; /* Include padding in width calculation */
+}
+
+.gif-container img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
