@@ -2,3 +2,4 @@
 # Installing flask.
 pip install flask
 pip install -U Flask-SQLAlchemy
+pip install flask-wtf

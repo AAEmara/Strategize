@@ -1,7 +1,9 @@
 <template>
 
   <div class="navbar">
-    <StrategyNav/>
+    <StrategyNav
+      :strategiesObject="strategies[0]"
+    />
   </div>
 
   <div class="sidebar">
@@ -10,28 +12,51 @@
 
   <div class="main-container">
     <!-- Create Direction Modal -->
-    <CreateDirection @direction-created="handleCreateDirection" :postPath="postDirectionPath"/>
+    <CreateDirection
+      @direction-created="handleCreateDirection"
+      :postPath="postDirectionPath"
+    />
 
     <!-- Create Learning and Growth Goal Modal -->
-    <CreateLearningGrowth @lg-goal-created="handleUpdateDirection" :directionsData="directions" :strategyId="strategyId"/>
+    <CreateLearningGrowth
+      @lg-goal-created="handleUpdateDirection"
+      :directionsData="directions"
+      :strategyId="strategyId"
+    />
 
     <!-- Create Productivity and Processes Goal Modal -->
-    <CreateProductivityProcesses @pp-goal-created="handleUpdateDirection" :ppDirectionsData="directions" :ppStrategyId="strategyId"/>
+    <CreateProductivityProcesses
+      @pp-goal-created="handleUpdateDirection"
+      :ppDirectionsData="directions"
+      :ppStrategyId="strategyId"
+    />
 
     <!-- Create Networking and Relationships Goal Modal -->
-    <CreateNetworkingRelationships @nr-goal-created="handleUpdateDirection" :nrDirectionsData="directions" :nrStrategyId="strategyId"/>
+    <CreateNetworkingRelationships
+      @nr-goal-created="handleUpdateDirection"
+      :nrDirectionsData="directions"
+      :nrStrategyId="strategyId"
+    />
 
     <!-- Create Financial Goal Modal -->
-    <CreateFinancial @f-goal-created="handleUpdateDirection" :fDirectionsData="directions" :fStrategyId="strategyId"/>
+    <CreateFinancial
+      @f-goal-created="handleUpdateDirection"
+      :fDirectionsData="directions"
+      :fStrategyId="strategyId"
+    />
 
     <!-- This should be the strategy page, so only one strategy accessible as desired from user -->
     <!-- TODO: There should be a dashboard page where the user sees all the strategies available to select -->
-    <h1 v-for="strategy in strategies" :key="strategy.id" :strategyId="strategy.id">{{ strategy.name }}</h1>
-    <h2>Strategic Directions</h2>
+    <h1 class="mt-2 mb-3">Strategic Directions</h1>
 
     <div class="d-flex flex-row justify-content-center flex-wrap">
       <div v-for="direction in directions" :key="direction.id" class="d-flex align-items-stretch ml-3">
-        <DirectionCard class="direction-card me-3" @direction-deleted="handleDeleteDirection" :directionData="direction" :cardId="'delete-direction-card-' + direction.id"/>
+        <DirectionCard
+          class="direction-card me-3"
+          @direction-deleted="handleDeleteDirection"
+          :directionData="direction"
+          :cardId="'delete-direction-card-' + direction.id"
+        />
         <UpdateDirection @direction-updated="handleUpdateDirection" :updateDirectionData="direction" :modalId="'update-direction-modal-' + direction.id"/>
       </div>
     </div>
@@ -42,16 +67,47 @@
 
     <!-- PERSPECTIVES & GOALS -->
 
-    <h2>Strategic Perspectives</h2>
+    <h1 class="mt-5 mb-3">Strategic Perspectives</h1>
     <div class="perspectives d-flex flex-row justify-content-between me-5">
       <div class="card" style="width: 18rem;" v-for="perspective in perspectives" :key="perspective.id">
         <div class="card-body">
           <h5 class="card-title">{{ perspective.name }}</h5>
-          <p class="card-text">Description for this perspective to enhance the user experience</p>
+          <p
+            v-if="perspective.name == 'Learning and Growth'"
+            class="card-text"
+          >
+            Focuses on intangible assets, emphasizing the internal skills, knowledge, and capabilities
+            necessary to support value-creating processes.
+          </p>
+          <p
+            v-else-if="perspective.name == 'Productivity and Processes'"
+            class="card-text"
+          >
+            Focuses on critical operations that must excel at to meet financial and
+            networking &amp; relationships goals, emphasizing the optimization of key processes to
+            enhace productivity and performance.
+          </p>
+          <p
+            v-else-if="perspective.name == 'Networking and Relationships'"
+            class="card-text"
+          >
+            Focuses on building and maintaining a robust network and connections, emphasizing the cultivation
+            of relationships that are mutually benficial and align with strategic goals.
+          </p>
+          <p
+            v-else-if="perspective.name == 'Financial'"
+            class="card-text"
+          >
+            Focuses on setting financial goals that aligns with the broader strategy, where it includes
+            goals related to profitability, budgeting and other aspects that helps achieving the strategy.
+          </p>
         </div>
         <ul class="list-group list-group-flush">
           <li class="list-group-item" v-for="goal in PerspectiveGoals(perspective.id)" :key="goal.id">
             {{ goal.name }}
+            <br>
+            <span class="badge rounded-pill text-bg-dark me-1">#DIR{{ goal.direction_id }}</span>
+            <span class="badge rounded-pill text-bg-warning">#GOAL{{ goal.id }}</span>
           </li>
         </ul>
         <div class="card-body">
@@ -181,6 +237,9 @@ export default {
   },
   created () {
     this.getStrategies()
+  },
+  mounted () {
+    document.title = 'Strategize - General Strategy'
   }
 }
 </script>

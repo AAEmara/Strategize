@@ -26,7 +26,7 @@
                 <select
                   class="form-select form-select-sm"
                   aria-label="Small select example"
-                  for="goal-direction"
+                  id="goal-direction"
                   v-model="directionId"
                 >
                   <option disabled value="" selected>Select a direction</option>

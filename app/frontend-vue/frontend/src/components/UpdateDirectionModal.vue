@@ -88,7 +88,6 @@ import axios from 'axios'
 export default {
   name: 'UpdateDirection',
   props: {
-    updatePath: String,
     updateDirectionData: Object,
     modalId: String
   },
