@@ -51,13 +51,14 @@ class Strategy(db.Model):
         self.update_date = self.creation_date
         self.name = name
         self.created_by = created_by
+        self.framework_id = fwork
 
     def __str__(self):
         """A string representation to the Strategy Class when printed."""
         return f"{{'id': {self.id}, 'name': {self.name}, "\
-               f"'creation date': {self.creation_date}, "\
-               f"'update date': {self.update_date}, "\
-               f"'created by': {self.created_by}}}"
+               f"'creation_date': {self.creation_date}, "\
+               f"'update_date': {self.update_date}, "\
+               f"'created_by': {self.created_by}}}"
 
 
 class Framework(db.Model):
@@ -119,6 +120,8 @@ class Goal(db.Model):
                                         db.ForeignKey("perspective.id"))
     perspective: Mapped["Perspective"] = db.relationship(
                                         back_populates="goals")
+    objectives: Mapped[List["Objective"]] = db.relationship(
+                                        back_populates="goal")
 
     def __init__(self, name="Untitled", note=None, direction_id=None,
                  perspective_id=None):
@@ -157,14 +160,44 @@ strategic goal."""
     start_date: Mapped[datetime] = mapped_column(db.DateTime, nullable=False)
     end_date: Mapped[datetime] = mapped_column(db.DateTime, nullable=False)
     kpi_value: Mapped[str] = mapped_column(db.String(128), nullable=False)
+    goal_id: Mapped[int] = mapped_column(db.ForeignKey("goal.id"))
+    kpi_id: Mapped[int] = mapped_column(db.ForeignKey("kpi.id"))
+    goal: Mapped["Goal"] = db.relationship(back_populates="objectives")
     milestones: Mapped[List["Milestone"]] = db.relationship(
                                                 back_populates="objective")
+    kpi: Mapped["Kpi"] = db.relationship(back_populates="objectives")
 
     def __str__(self):
         """A string representation to the Objective Class when printed."""
         return f"{{'id': {self.id}, 'name': {self.name}, "\
                f"'start_date': {self.start_date}, "\
-               f"'end_date': {self.end_date}, 'kpi_value': {self.kpi_value}}}"
+               f"'end_date': {self.end_date}, 'kpi_value': {self.kpi_value}, "\
+               f"'goal_id': {self.goal_id}}}"
+
+
+class Kpi(db.Model):
+    """Class Kpi that defines the how an objective or a milestone is going to 
+    be measured."""
+    __tablename__ = "kpi"
+    id: Mapped[int] = mapped_column(db.Integer, primary_key=True,
+                                    unique=True, nullable=False)
+    name: Mapped[str] = mapped_column(db.String(256), nullable=False)
+    definition: Mapped[str] = mapped_column(db.String(1024), nullable=False)
+    datatype_id: Mapped[int] = mapped_column(db.ForeignKey("datatype.id"))
+    datatype: Mapped["Datatype"] = db.relationship(
+                                            back_populates="kpis")
+    objectives: Mapped[List["Objective"]] = db.relationship(
+                                                back_populates="kpi")
+
+class Datatype(db.Model):
+    """Class Datatype that defines what is the datatype of the KPI Value
+    to be inserted."""
+    __tablename__ = "datatype"
+    id: Mapped[int] = mapped_column(db.Integer, primary_key=True,
+                                    unique=True, nullable=False)
+    name: Mapped[str] = mapped_column(db.String(128), nullable=False)
+    kpis: Mapped[List["Kpi"]] = db.relationship(
+                                            back_populates="datatype")
 
 
 class Milestone(db.Model):
